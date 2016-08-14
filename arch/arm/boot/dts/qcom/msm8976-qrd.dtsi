@@ -45,6 +45,16 @@
 	};
 };
 
+&i2c_2 { /* BLSP2 QUP2 */
+	ktd@30 { /* Breath Light-Driven */
+        compatible = "ktd,ktd2026";
+        reg = <0x30>;
+        ktd,ledr-parameter_array = <255 12 500 12 500 0 0>;
+        ktd,ledg-parameter_array = <255 12 500 12 500 0 0>;
+        ktd,ledb-parameter_array = <255 12 500 12 500 0 0>;
+	};
+};
+
 &sdhc_1 {
 	vdd-supply = <&pm8950_l8>;
 	qcom,vdd-voltage-level = <2900000 2900000>;
