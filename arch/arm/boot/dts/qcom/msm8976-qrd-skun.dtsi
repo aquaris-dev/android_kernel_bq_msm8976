@@ -91,6 +91,17 @@
 	};
 };
 
+&i2c_8 {
+		tfa98xx@36 {
+			compatible = "nxp,tfa98xx";
+			reg = <0x34>;
+			nxp,tfa_max-vol-steps=<0x01>;
+			nxp,reset-gpio = <&msm_gpio 13 0>;
+			nxp,irq-gpio = <&msm_gpio 12 0x2008>;
+			status = "okay";
+			};
+};
+
 &soc {
 	gpio_keys {
 		compatible = "gpio-keys";
