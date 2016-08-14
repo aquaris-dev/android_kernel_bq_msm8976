@@ -51,6 +51,22 @@
 		focaltech,resume-in-workqueue;
 	};
 
+&i2c_2 {
+	lm3697@36 {
+		compatible = "ti,lm3697";
+		reg = <0x36>;
+		ti,enable-gpio = <&msm_gpio 50 0>;
+		lcd_bl {
+			backlight-name = "lcd";
+			hvled1-used;
+			hvled2-used;
+
+			max-current-milliamp = <25>;
+			initial-brightness = <2000>;
+		};
+	};
+};
+
 	synaptics@20 {
 		compatible = "synaptics,rmi4";
 		reg = <0x20>;
