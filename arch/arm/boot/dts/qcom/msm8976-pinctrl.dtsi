@@ -90,6 +90,21 @@
 			};
 		};
 
+		hall_int_pin {
+			qcom,pins = <&gp 107>;
+			qcom,pin-func = <0>;
+			qcom,num-grp-pins = <1>;
+			label = "hall_int_pin";
+			hall_int_active: active {
+				drive-strength = <6>;
+				bias-pull-up;
+			};
+			hall_int_suspend: suspend {
+				drive-strength = <6>;
+				bias-pull-up;
+			};
+		};
+
 		blsp1_uart1_active {
 			qcom,pins = <&gp 0>, <&gp 1>, <&gp 2>, <&gp 3>;
 			qcom,num-grp-pins = <4>;
