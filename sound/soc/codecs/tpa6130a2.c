@@ -25,6 +25,7 @@
 #include <linux/device.h>
 #include <linux/i2c.h>
 #include <linux/gpio.h>
+#include <linux/of_gpio.h>
 #include <linux/regulator/consumer.h>
 #include <linux/slab.h>
 #include <sound/tpa6130a2-plat.h>
@@ -135,12 +136,12 @@ static int tpa6130a2_power(u8 power)
 		goto exit;
 
 	if (power) {
-		ret = regulator_enable(data->supply);
+		/*ret = regulator_enable(data->supply);
 		if (ret != 0) {
 			dev_err(&tpa6130a2_client->dev,
 				"Failed to enable supply: %d\n", ret);
 			goto exit;
-		}
+		}*/
 		/* Power on */
 		if (data->power_gpio >= 0)
 			gpio_set_value(data->power_gpio, 1);
@@ -152,7 +153,7 @@ static int tpa6130a2_power(u8 power)
 				"Failed to initialize chip\n");
 			if (data->power_gpio >= 0)
 				gpio_set_value(data->power_gpio, 0);
-			regulator_disable(data->supply);
+			//regulator_disable(data->supply);
 			data->power_state = 0;
 			goto exit;
 		}
@@ -162,16 +163,19 @@ static int tpa6130a2_power(u8 power)
 		val |= TPA6130A2_SWS;
 		tpa6130a2_i2c_write(TPA6130A2_REG_CONTROL, val);
 
+		tpa6130a2_read(TPA6130A2_REG_CONTROL);
+		tpa6130a2_read(TPA6130A2_REG_VOL_MUTE);
+		tpa6130a2_read(TPA6130A2_REG_OUT_IMPEDANCE);
 		/* Power off */
 		if (data->power_gpio >= 0)
 			gpio_set_value(data->power_gpio, 0);
 
-		ret = regulator_disable(data->supply);
+		/* ret = regulator_disable(data->supply);
 		if (ret != 0) {
 			dev_err(&tpa6130a2_client->dev,
 				"Failed to disable supply: %d\n", ret);
 			goto exit;
-		}
+		}*/
 
 		data->power_state = 0;
 	}
@@ -331,6 +335,9 @@ int tpa6130a2_stereo_enable(struct snd_soc_codec *codec, int enable)
 			return ret;
 		tpa6130a2_channel_enable(TPA6130A2_HP_EN_R | TPA6130A2_HP_EN_L,
 					 1);
+		tpa6130a2_read(TPA6130A2_REG_CONTROL);
+		tpa6130a2_read(TPA6130A2_REG_VOL_MUTE);
+		tpa6130a2_read(TPA6130A2_REG_OUT_IMPEDANCE);
 	} else {
 		tpa6130a2_channel_enable(TPA6130A2_HP_EN_R | TPA6130A2_HP_EN_L,
 					 0);
@@ -364,17 +371,15 @@ static int tpa6130a2_probe(struct i2c_client *client,
 {
 	struct device *dev;
 	struct tpa6130a2_data *data;
-	struct tpa6130a2_platform_data *pdata;
 	const char *regulator;
 	int ret;
 
 	dev = &client->dev;
-
-	if (client->dev.platform_data == NULL) {
+/*	if (client->dev.platform_data == NULL) {
 		dev_err(dev, "Platform data not set\n");
 		dump_stack();
 		return -ENODEV;
-	}
+	} */
 
 	data = devm_kzalloc(&client->dev, sizeof(*data), GFP_KERNEL);
 	if (data == NULL) {
@@ -386,8 +391,8 @@ static int tpa6130a2_probe(struct i2c_client *client,
 
 	i2c_set_clientdata(tpa6130a2_client, data);
 
-	pdata = client->dev.platform_data;
-	data->power_gpio = pdata->power_gpio;
+	//pdata = client->dev.platform_data;
+	//data->power_gpio = pdata->power_gpio;
 	data->id = id->driver_data;
 
 	mutex_init(&data->mutex);
@@ -395,9 +400,9 @@ static int tpa6130a2_probe(struct i2c_client *client,
 	/* Set default register values */
 	data->regs[TPA6130A2_REG_CONTROL] =	TPA6130A2_SWS;
 	data->regs[TPA6130A2_REG_VOL_MUTE] =	TPA6130A2_MUTE_R |
-						TPA6130A2_MUTE_L;
+						TPA6130A2_MUTE_L | TPA6130A2_VOLUME(0x3f);
 
-	if (data->power_gpio >= 0) {
+/*	if (data->power_gpio >= 0) {
 		ret = devm_gpio_request(dev, data->power_gpio,
 					"tpa6130a2 enable");
 		if (ret < 0) {
@@ -406,8 +411,7 @@ static int tpa6130a2_probe(struct i2c_client *client,
 			goto err_gpio;
 		}
 		gpio_direction_output(data->power_gpio, 0);
-	}
-
+	} */
 	switch (data->id) {
 	default:
 		dev_warn(dev, "Unknown TPA model (%d). Assuming 6130A2\n",
@@ -420,12 +424,12 @@ static int tpa6130a2_probe(struct i2c_client *client,
 		break;
 	}
 
-	data->supply = devm_regulator_get(dev, regulator);
+/*	data->supply = devm_regulator_get(dev, regulator);
 	if (IS_ERR(data->supply)) {
 		ret = PTR_ERR(data->supply);
 		dev_err(dev, "Failed to request supply: %d\n", ret);
 		goto err_gpio;
-	}
+	}*/
 
 	ret = tpa6130a2_power(1);
 	if (ret != 0)

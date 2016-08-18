@@ -188,8 +188,8 @@ static void *def_tasha_mbhc_cal(void)
 		(sizeof(btn_cfg->_v_btn_low[0]) * btn_cfg->num_btn);
 
 	btn_high[0] = 75;
-	btn_high[1] = 150;
-	btn_high[2] = 237;
+	btn_high[1] = 100;
+	btn_high[2] = 200;
 	btn_high[3] = 450;
 	btn_high[4] = 450;
 	btn_high[5] = 450;
@@ -448,7 +448,7 @@ static int msm8952_set_spk(struct snd_kcontrol *kcontrol,
 static int msm8952_enable_codec_mclk(struct snd_soc_codec *codec, int enable,
 					bool dapm)
 {
-	pr_debug("%s: enable = %d\n", __func__, enable);
+	pr_debug("%s: enable = %d,codec name =%s\n", __func__, enable,dev_name(codec->dev));
 
 	if (!strcmp(dev_name(codec->dev), "tomtom_codec"))
 		tomtom_codec_mclk_enable(codec, enable, dapm);
@@ -2316,7 +2316,7 @@ cpu_dai:
 						 "asoc-cpu-names",
 						 dai_link[i].cpu_dai_name);
 			if (index < 0) {
-				pr_debug("cpu-names not found index = %d\n", i);
+				pr_debug("cpu-names not found index = %d, name=%s\n", i, dai_link[i].cpu_dai_name);
 				goto codec_dai;
 			}
 			phandle = of_parse_phandle(cdev->of_node, "asoc-cpu",
