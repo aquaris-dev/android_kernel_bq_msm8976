@@ -863,6 +863,11 @@ config SENSORS_ISL29044A
 	help
 	 This option enables support for the INTERSIL ISL29044A P/L sensor.
 
+config FP_SYNAPTICS
+	tristate "Synaptics Fingerprint sensor"
+	depends on SPI
+	help
+	 This option enables support for the Synaptics Fingerprint sensor.
 
 config FP_GOODIX
 	tristate "Goodix Fingerprint sensor"
