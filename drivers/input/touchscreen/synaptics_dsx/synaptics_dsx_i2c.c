@@ -34,7 +34,7 @@
 #include "synaptics_dsx_core.h"
 #include <linux/of_gpio.h>
 
-#define SYN_I2C_RETRY_TIMES 10
+#define SYN_I2C_RETRY_TIMES 2
 
 /*
 #define I2C_BURST_LIMIT 255
