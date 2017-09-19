@@ -1635,7 +1635,7 @@ v_U8_t* wlan_hdd_get_vendor_oui_ie_ptr(v_U8_t *oui, v_U8_t oui_size, v_U8_t *ie,
                     eid,elem_len,left);
             return NULL;
         }
-        if (elem_id == eid)
+        if ((elem_id == eid) && (elem_len >= oui_size))
         {
             if(memcmp( &ptr[2], oui, oui_size)==0)
                 return ptr;
@@ -6919,6 +6919,7 @@ static int __iw_get_char_setnone(struct net_device *dev,
             hdd_context_t *pHddCtx = WLAN_HDD_GET_CTX(pAdapter);
             hdd_tx_rx_stats_t *pStats = &pAdapter->hdd_stats.hddTxRxStats;
             hdd_chip_reset_stats_t *pResetStats = &pHddCtx->hddChipResetStats;
+            hdd_arp_stats_t *parpStats = &pAdapter->hdd_stats.hddArpStats;
 
 
             snprintf(extra, WE_MAX_STR_LEN,
@@ -6939,6 +6940,11 @@ static int __iw_get_char_setnone(struct net_device *dev,
                      "\nchains %u, packets %u, dropped %u, delivered %u, refused %u"
                      "\n\nResetsStats"
                      "\n TotalLogp %u Cmd53 %u MutexRead %u  MIF-Error %u FW-Heartbeat %u Others %u"
+                     "\n"
+                     "\n\nARP Transmit"
+                     "\nTransmit Count %u, dropped %u"
+                     "\n\nARP Receive"
+                     "\nReceive Count %u, dropped %u, Delivered %u, Refused %u, Drop Reason %u"
                      "\n",
                      pStats->txXmitCalled,
                      pStats->txXmitDropped,
@@ -7012,7 +7018,16 @@ static int __iw_get_char_setnone(struct net_device *dev,
                      pResetStats->totalMutexReadFailures,
                      pResetStats->totalMIFErrorFailures,
                      pResetStats->totalFWHearbeatFailures,
-                     pResetStats->totalUnknownExceptions
+                     pResetStats->totalUnknownExceptions,
+
+                     parpStats->tx_arp_req_count,
+                     parpStats->txDropped,
+
+                     parpStats->rx_arp_rsp_count,
+                     parpStats->rxDropped,
+                     parpStats->rxDelivered,
+                     parpStats->rxRefused,
+                     parpStats->reason
                      );
             wrqu->data.length = strlen(extra);
 
